@@ -1,0 +1,25 @@
+{
+  "name": "graphsify",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "react": "^16.3.0",
+    "react-dom": "^16.3.0",
+    "react-scripts": "1.1.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "xo && react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "xo": "^0.20.3"
+  },
+  "xo": {
+    "space": true,
+    "rules": {
+      "linebreak-style": 0
+    }
+  }
+}
