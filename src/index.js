@@ -1,9 +1,14 @@
+// TO GET PASSED THE CORS ERROR:
+// open windows "run"
+// enter command: chrome.exe --user-data-dir="C:/Chrome dev session" --disable-web-security
+// the window that opens allow the security to be bypassed
+
 var request = require('request'); // "Request" library
 
 var client_id = 'ea788a5aa0034d16a33d9d60488f2f45'; // Your client id
 var client_secret = '2a21c40782a34a71bb28701440b287be'; // Your secret
 
-// your application requests authorization
+// Application requests authorization
 var authOptions = {
   url: 'https://accounts.spotify.com/api/token',
   headers: {
@@ -15,9 +20,16 @@ var authOptions = {
   json: true
 };
 
-var trackNameToID = function(trackName) {
+// the 
+var id = "0";
+var info = null;
+var features = null;
+
+var trackNameToID = function(trackName, artist, callback) {
 	var trackNameFormatted = trackName.split(' ').join('+')
-	var requestUrl = 'https://api.spotify.com/v1/search/?q=' + trackNameFormatted + '&type=track';
+	var artistNameFormatted = trackName.split(' ').join('+')
+	var query = trackNameFormatted + '+' + artistNameFormatted
+	var requestUrl = 'https://api.spotify.com/v1/search/?q=' + query + '&type=track';
 	request.post(authOptions, function(error, response, body) {
 	  if (!error && response.statusCode === 200) {
 
@@ -31,93 +43,63 @@ var trackNameToID = function(trackName) {
 	      json: true
 	    };
 	    request.get(options, function(error, response, body) {
-	    	console.log(body.tracks.items[0].id);
-	      	return body.tracks.items[0].id;
+	      	id = body.tracks.items[0].id;
+	      	callback(id);
 	    });
 	  }
 	});
 }
 
-var trackIDToTrackInfo = function(trackID) {
-	var requestUrl = 'https://api.spotify.com/v1/tracks/' + '6rqhFgbbKwnb9MLmUQDhG6'//trackID;
-	request.post(authOptions, function(error, response, body) {
-	  if (!error && response.statusCode === 200) {
+var trackNameToTrackInfo = function(trackName, artist, callback) {
+	trackNameToID(trackName, artist, function(trackID) {
+		var requestUrl = 'https://api.spotify.com/v1/tracks/' + trackID;
+		request.post(authOptions, function(error, response, body) {
+		  if (!error && response.statusCode === 200) {
 
-	    // use the access token to access the Spotify Web API
-	    var token = body.access_token;
-	    var options = {
-	      url: requestUrl,
-	      headers: {
-	        'Authorization': 'Bearer ' + token
-	      },
-	      json: true
-	    };
-	    request.get(options, function(error, response, body) {
-	      console.log(body);
-	    });
-	  }
-	});
+		    // use the access token to access the Spotify Web API
+		    var token = body.access_token;
+		    var options = {
+		      url: requestUrl,
+		      headers: {
+		        'Authorization': 'Bearer ' + token
+		      },
+		      json: true
+		    };
+		    request.get(options, function(error, response, body) {
+		      info = body;
+		      callback(info);
+		    });
+		  }
+		});
+	})
 }
 
-var trackIDToFeatures = function(trackID) {
-	request.post(authOptions, function(error, response, body) {
-	  if (!error && response.statusCode === 200) {
+var trackNameToFeatures = function(trackName, artist, callback) {
+	trackNameToID(trackName, artist, function(trackID) {
+		request.post(authOptions, function(error, response, body) {
+		  if (!error && response.statusCode === 200) {
 
-	    // use the access token to access the Spotify Web API
-	    var token = body.access_token;
-	    var options = {
-	      url: 'https://api.spotify.com/v1/audio-features/6rqhFgbbKwnb9MLmUQDhG6',
-	      headers: {
-	        'Authorization': 'Bearer ' + token
-	      },
-	      json: true
-	    };
-	    request.get(options, function(error, response, body) {
-	      	console.log(body);
-	    });
-	  }
-	});
+		    // use the access token to access the Spotify Web API
+		    var token = body.access_token;
+		    var options = {
+		      url: 'https://api.spotify.com/v1/audio-features/6rqhFgbbKwnb9MLmUQDhG6',
+		      headers: {
+		        'Authorization': 'Bearer ' + token
+		      },
+		      json: true
+		    };
+		    request.get(options, function(error, response, body) {
+		      	features = body;
+		      	callback(features);
+		    });
+		  }
+		});
+	}) 
 }
 
-
-var id = trackNameToID("Castle of Glass");
-var info = trackIDToTrackInfo(id);
-var features = trackIDToFeatures(id);
-console.log(info)
-
-
-// import axios from 'axios';
-// var request = require('request');
-
-
-// var client_id = 'ea788a5aa0034d16a33d9d60488f2f45'; // Your client id
-// var client_secret = '2a21c40782a34a71bb28701440b287be'; // Your secret
-// var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
-
-// console.log('updated');
-
-// var auth_resp = request.post("https://accounts.spotify.com/api/token", {
-// 		Authorization: "Basic ZWE3ODhhNWFhMDAzNGQxNmEzM2Q5ZDYwNDg4ZjJmNDU6MmEyMWM0MDc4MmEzNGE3MWJiMjg3MDE0NDBiMjg3YmU=",
-// 		grant_type: "client_credentials",
-// 	headers: {
-// 		'Content_Type': 'application/json; charset=utf-8',
-// 	}
-// });
-
-// var auth_resp = axios.post("https://accounts.spotify.com/api/token", {
-// 	params: {
-// 		Authorization: "Basic ZWE3ODhhNWFhMDAzNGQxNmEzM2Q5ZDYwNDg4ZjJmNDU6MmEyMWM0MDc4MmEzNGE3MWJiMjg3MDE0NDBiMjg3YmU=",
-// 		grant_type: "client_credentials",
-// 	},
-// 	headers: {
-// 		'Content_Type': 'application/json; charset=utf-8',
-// 	}
-// });
-//auth_resp.catch(x => console.log(x));
-
-
-//let resp = axios.get('https://api.spotify.com/v1/tracks/6rqhFgbbKwnb9MLmUQDhG6', {
-
-//});
-//resp.then(x => console.log(x));
-//resp.catch(x => console.log(x));
+trackNameToTrackInfo("Castle of Glass", "Linkin Park", function(info) {
+	console.log(info);
+});
+trackNameToFeatures("Castle of Glass", "Linkin Park", function(features) {
+	console.log(features);
+})
