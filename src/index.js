@@ -82,7 +82,7 @@ var trackNameToFeatures = function(trackName, artist, callback) {
 		    // use the access token to access the Spotify Web API
 		    var token = body.access_token;
 		    var options = {
-		      url: 'https://api.spotify.com/v1/audio-features/6rqhFgbbKwnb9MLmUQDhG6',
+		      url: 'https://api.spotify.com/v1/audio-features/' + trackID,
 		      headers: {
 		        'Authorization': 'Bearer ' + token
 		      },
@@ -97,9 +97,30 @@ var trackNameToFeatures = function(trackName, artist, callback) {
 	}) 
 }
 
+var allTracks = [];
+var allFeatures = [];
+
 trackNameToTrackInfo("Castle of Glass", "Linkin Park", function(info) {
-	console.log(info);
+	allTracks.push(info);
 });
 trackNameToFeatures("Castle of Glass", "Linkin Park", function(features) {
-	console.log(features);
-})
+	allFeatures.push(features);
+});
+
+trackNameToTrackInfo("In the End", "Linkin Park", function(info) {
+	allTracks.push(info);
+});
+trackNameToFeatures("In the End", "Linkin Park", function(features) {
+	allFeatures.push(features);
+});
+
+trackNameToTrackInfo("Livin on a Prayer", "Bon Jovi", function(info) {
+	allTracks.push(info);
+});
+trackNameToFeatures("Livin on a Prayer", "Bon Jovi", function(features) {
+	allFeatures.push(features);
+});
+
+console.log(allTracks)
+console.log(allFeatures)
+
