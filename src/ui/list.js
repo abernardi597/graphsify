@@ -18,7 +18,7 @@ const styles = theme => ({
   }
 });
 
-function List(props) {
+function TrackList(props) {
   const {classes, tracks} = props;
   return (
     <Paper className={classes.listPaper}>
@@ -42,9 +42,9 @@ function List(props) {
   );
 }
 
-List.propTypes = {
+TrackList.propTypes = {
   tracks: PropTypes.array.isRequired,
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(List);
+export default withStyles(styles)(TrackList);
