@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.links line {
+  stroke: #999;
+  stroke-opacity: 0.6;
+}
+
+.nodes circle {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+</style>
+<svg width="960" height="600"></svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+<script>
+
+function calcDist(f1, f2) {
+  weights = []
+  values = []
+  values.push(Math.)
+}
+
+function generateLinks(nodes) {
+  links = []
+  for(var i = 0; i < nodes.length; i++) {
+    for(var j = 0; j < nodes.length; j++) {
+      if(i != j) {
+        dist = calcDist(nodes[i].features, nodes[j].features)
+      }
+    }
+  }
+}
+
+var data = 
+[
+{id:1000, name:"song", artist:"singer", sample:"filler", 
+  features:{loudness:10, danceability:.3, key:3, loudness:-10, mode:0, speechiness:.01, acousticness:.5, instrumentalness:0.09, liveness:.1, valence:.6, tempo:98, energy:.2}},
+{id:1001, name:"song2", artist:"singer2", sample:"filler2", 
+  features:{loudness:10, danceability:.4, key:0, loudness:-10, mode:0, speechiness:.06, acousticness:.2, instrumentalness:0.9, liveness:.9, valence:.8, tempo:102, energy:.3}},
+{id:1002, name:"song3", artist:"singer3", sample:"filler3", 
+  features:{loudness:10, danceability:.8, key:1, loudness:-10, mode:1, speechiness:.5, acousticness:.7, instrumentalness:0.3, liveness:.4, valence:.2, tempo:150, energy:.5}},
+{id:1003, name:"song4", artist:"singer4", sample:"filler4", 
+  features:{loudness:10, danceability:.1, key:5, loudness:-10, mode:1, speechiness:.8, acousticness:.1, instrumentalness:0.1, liveness:.8, valence:.1, tempo:60, energy:1}}
+];
+
+generateLinks(data)
+
+var graph = {
+  "nodes": data,
+  "links": [{"source": 1000, "target": 1001, "value": 1}]
+}
+
+var svg = d3.select("svg"),
+    width = +svg.attr("width"),
+    height = +svg.attr("height");
+
+var color = d3.scaleOrdinal(d3.schemeCategory20);
+
+var simulation = d3.forceSimulation()
+    .force("link", d3.forceLink().id(function(d) { return d.id; }))
+    .force("charge", d3.forceManyBody())
+    .force("center", d3.forceCenter(width / 2, height / 2));
+
+
+
+var link = svg.append("g")
+    .attr("class", "links")
+  .selectAll("line")
+  .data(graph.links)
+  .enter().append("line")
+    .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
+
+var node = svg.append("g")
+    .attr("class", "nodes")
+  .selectAll("circle")
+  .data(graph.nodes)
+  .enter().append("circle")
+    .attr("r", 5)
+    .attr("fill", function(d) { return color(d.group); })
+    .call(d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended));
+
+node.append("title")
+    .text(function(d) { return d.id; });
+
+simulation
+    .nodes(graph.nodes)
+    .on("tick", ticked);
+
+simulation.force("link")
+    .links(graph.links);
+
+function ticked() {
+  link
+      .attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
+
+  node
+      .attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; });
+}
+
+function dragstarted(d) {
+  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+  d.fx = d.x;
+  d.fy = d.y;
+}
+
+function dragged(d) {
+  d.fx = d3.event.x;
+  d.fy = d3.event.y;
+}
+
+function dragended(d) {
+  if (!d3.event.active) simulation.alphaTarget(0);
+  d.fx = null;
+  d.fy = null;
+}
+
+</script>
