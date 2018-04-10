@@ -17,22 +17,59 @@
 <script src="https://d3js.org/d3.v4.min.js"></script>
 
 <script>
+var weights = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+var maxVal = 0;
+for(var i = 0; i < weights.length; i++) {
+  maxVal += weights[i];
+}
 
 function calcDist(f1, f2) {
-  weights = []
-  values = []
-  values.push(Math.)
+  // acousticness, danceability, energy, instrumentalness, key, liveness, mode, speechiness, tempo, valence
+  //var weights = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  var values = []
+  values.push(Math.abs(f1.acousticness - f2.acousticness))
+  values.push(Math.abs(f1.danceability - f2.danceability))
+  values.push(Math.abs(f1.energy - f2.energy))
+  values.push(Math.abs(f1.instrumentalness - f2.instrumentalness))
+  if(f1.key == f2.key) {
+    values.push(1)
+  }
+  else {
+    values.push(0)
+  }
+  values.push(Math.abs(f1.liveness - f2.liveness))
+  if(f1.mode == f2.mode) {
+    values.push(1)
+  }
+  else {
+    values.push(0)
+  }
+  values.push(Math.abs(f1.speechiness - f2.speechiness))
+  values.push(Math.abs(f1.tempo - f2.tempo) / 200)
+  values.push(Math.abs(f1.valence - f2.valence))
+  var dist = 0;
+  for(var i=0; i< values.length; i++) {
+    dist += values[i] * weights[i];
+  }
+  console.log(dist)
+  return dist;
 }
 
 function generateLinks(nodes) {
-  links = []
+  var links = []
   for(var i = 0; i < nodes.length; i++) {
     for(var j = 0; j < nodes.length; j++) {
       if(i != j) {
+        var source = nodes[i].id
+        var target = nodes[j].id
         dist = calcDist(nodes[i].features, nodes[j].features)
+        if(dist > (maxVal / 3)) {
+            links.push({source: source, target: target, value: dist})
+        }
       }
     }
   }
+  return links
 }
 
 var data = 
@@ -47,11 +84,11 @@ var data =
   features:{loudness:10, danceability:.1, key:5, loudness:-10, mode:1, speechiness:.8, acousticness:.1, instrumentalness:0.1, liveness:.8, valence:.1, tempo:60, energy:1}}
 ];
 
-generateLinks(data)
+links = generateLinks(data)
 
 var graph = {
   "nodes": data,
-  "links": [{"source": 1000, "target": 1001, "value": 1}]
+  "links": links
 }
 
 var svg = d3.select("svg"),
