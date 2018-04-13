@@ -16,7 +16,7 @@ div.tooltip {
     position: absolute;     
     text-align: center;     
     width: 120px;          
-    height: 40px;         
+    height: 80px;         
     padding: 2px;       
     font: 12px sans-serif;    
     background: lightsteelblue; 
@@ -109,7 +109,7 @@ function generateLinks(nodes) {
   return linkList
 }
 
-var data = 
+/*var data = 
 [
 {id:1000, name:"Song 1", artist:["Artist 1", "Artist 2"], sample:"filler", 
   features:{loudness:10, danceability:Math.random(), key:Math.floor(Math.random()*6), mode:Math.floor(Math.random()*3), speechiness:Math.random(), acousticness:Math.random(), instrumentalness:Math.random(), liveness:Math.random(), valence:Math.random(), tempo:Math.floor(Math.random()*201), energy:Math.random()}},
@@ -135,7 +135,13 @@ var data =
   features:{loudness:10, danceability:Math.random(), key:Math.floor(Math.random()*6), mode:Math.floor(Math.random()*3), speechiness:Math.random(), acousticness:Math.random(), instrumentalness:Math.random(), liveness:Math.random(), valence:Math.random(), tempo:Math.floor(Math.random()*201), energy:Math.random()}},
 {id:1011, name:"Song 12", artist:["Artist 6"], sample:"filler", 
   features:{loudness:10, danceability:Math.random(), key:Math.floor(Math.random()*6), mode:Math.floor(Math.random()*3), speechiness:Math.random(), acousticness:Math.random(), instrumentalness:Math.random(), liveness:Math.random(), valence:Math.random(), tempo:Math.floor(Math.random()*201), energy:Math.random()}},
-];
+];*/
+var data = [
+{id:1, name: "Love Lies", artist: ["Khalid", "Normani"], features: {acousticness:0.0956, danceability:0.708, energy:0.648, instrumentalness:0, key:6, liveness:0.134, loudness:-5.626, mode:1, popularity:98, speechiness:0.0449, tempo:143.955, valence:0.338}},
+{id:2, name: "Dangerously In Love", artist: ["Beyoncé", "JAY Z"], features: {acousticness:0.00249, danceability:0.646, energy:0.77, instrumentalness:0, key:2, liveness:0.0715, loudness:-6.596, mode:0, popularity:80, speechiness:0.226, tempo:99.165, valence:0.681}},
+{id:3, name: "Bad at Love", artist: ["Halsey"], features: {acousticness:0.06, danceability:0.675, energy:0.736, instrumentalness:0, key:0, liveness:0.0879, loudness:-3.604, mode:1, popularity:82, speechiness:0.0302, tempo:118.369, valence:0.607}},
+{id:4, name: "Mad Love", artist: ["Sean Paul", "David Guetta", "Becky G"], features: {acousticness:0.00523, danceability:0.804, energy:0.823, instrumentalness:0, key:11, liveness:0.168, loudness:-3.496, mode:0, popularity:83, speechiness:0.147, tempo:98.026, valence:0.619}}
+]
 
 var artists = [];
 for(var i = 0; i < data.length; i++) {
@@ -153,7 +159,7 @@ var svg = d3.select("svg"),
     width = +svg.attr("width"),
     height = +svg.attr("height");
 
-var color = d3.scaleOrdinal(d3.schemeCategory20);
+var color = d3.scaleOrdinal(d3.schemeCategory10);
 
 var tooltip = d3.select("body").append("div") 
     .attr("class", "tooltip")       
@@ -205,9 +211,6 @@ var node = svg.append("g")
              .style("opacity", 0); 
     });
 
-
-node.append("title")
-    .text(function(d) { return d.id; });
 
 var simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(function(d) { return d.value * 30}))
