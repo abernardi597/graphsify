@@ -2,43 +2,37 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {withStyles} from 'material-ui/styles';
 
-import Table, {TableBody, TableCell, TableHead, TableRow} from 'material-ui/Table';
-import Paper from 'material-ui/Paper';
+import Avatar from 'material-ui/Avatar';
+import List, {ListItem, ListItemAvatar, ListItemText} from 'material-ui/List';
 
-const styles = theme => ({
-  listPaper: {
-    width: '100%',
-    minHeight: '80%',
-    marginTop: theme.spacing.unit * 2,
-    marginBottom: theme.spacing.unit * 2,
-    overflow: 'auto'
-  },
-  listTable: {
-    minWidth: '100%'
-  }
-});
+const styles = {
+};
+
+let Track = props => {
+  const {track} = props;
+  return (
+    <ListItem button>
+      <ListItemAvatar>
+        <Avatar src={track.art.url} />
+      </ListItemAvatar>
+      <ListItemText primary={track.name} secondary={track.artists.join(', ')}/>
+    </ListItem>
+  );
+};
+
+Track.propTypes = {
+  track: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired
+};
+
+Track = withStyles(styles)(Track);
 
 function TrackList(props) {
-  const {classes, tracks} = props;
+  const {tracks} = props;
   return (
-    <Paper className={classes.listPaper}>
-      <Table className={classes.listTable}>
-        <TableHead>
-          <TableCell>Song</TableCell>
-          <TableCell>Artist</TableCell>
-          <TableCell>Album</TableCell>
-        </TableHead>
-        <TableBody>
-          {tracks.map(t => (
-            <TableRow hover key={t.id}>
-              <TableCell>{t.name}</TableCell>
-              <TableCell>{t.artist}</TableCell>
-              <TableCell>{t.album}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </Paper>
+    <List dense>
+      {tracks.map(track => (<Track key={track.id} track={track} />))}
+    </List>
   );
 }
 

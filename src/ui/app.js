@@ -44,9 +44,13 @@ const active = [
   {
     id: '5Cw6SX4MtdaOvM0GbN5g7j',
     name: '8 Bit Adventure',
-    artist: 'AdhesiveWombat',
+    artists: ['AdhesiveWombat'],
     album: 'Marsupial Madness',
-    art: 'https://i.scdn.co/image/af7dadc5da4ac8a3db7c2757228baf45eab7f63a',
+    art: {
+      height: 640,
+      width: 640,
+      url: 'https://i.scdn.co/image/af7dadc5da4ac8a3db7c2757228baf45eab7f63a'
+    },
     sample: 'https://p.scdn.co/mp3-preview/f8084b79e16ac3849eb37cf9cf6c2ceafbea931c?cid=774b29d4f13844c495f206cafdad9c86',
     features: {
       danceability: 0.543,
@@ -65,9 +69,13 @@ const active = [
   {
     id: '2S4CfxZG29GZWwDeMtBq2R',
     name: 'I Just Wanna Run',
-    artist: 'The Downtown Fiction',
+    artists: ['The Downtown Fiction'],
     album: 'Best I Never Had',
-    art: 'https://i.scdn.co/image/4c78bf7f246502aefb02df7ef50ccce457497933',
+    art: {
+      height: 640,
+      width: 640,
+      url: 'https://i.scdn.co/image/4c78bf7f246502aefb02df7ef50ccce457497933'
+    },
     sample: 'https://p.scdn.co/mp3-preview/d16ef491b7bf665198a991fcf81c53f3df6fcd4d?cid=774b29d4f13844c495f206cafdad9c86',
     features: {
       danceability: 0.669,

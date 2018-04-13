@@ -3,15 +3,31 @@ import PropTypes from 'prop-types';
 import {withStyles} from 'material-ui/styles';
 
 import Stepper, {Step, StepButton, StepContent} from 'material-ui/Stepper';
+import Button from 'material-ui/Button';
 
 import IconLibraryMusic from 'material-ui-icons/LibraryMusic';
 import IconExplore from 'material-ui-icons/Explore';
 import IconSave from 'material-ui-icons/Save';
+import IconAdd from 'material-ui-icons/Add';
 
-import List from './list';
+import TrackList from './list';
 
-const styles = {
-};
+const styles = theme => ({
+  contentRoot: {
+    marginTop: theme.spacing.unit * 2,
+    position: 'relative'
+  },
+  listRoot: {
+    overflow: 'auto',
+    position: 'relative',
+    height: '500px'
+  },
+  button: {
+    position: 'absolute',
+    bottom: theme.spacing.unit * 1.5,
+    right: theme.spacing.unit * 4
+  }
+});
 
 class Library extends React.Component {
   constructor() {
@@ -23,6 +39,7 @@ class Library extends React.Component {
 
   render() {
     const {step} = this.state;
+    const {classes} = this.props;
     const color = index => step === index ? 'secondary' : 'disabled';
     const changeStep = step => () => {
       this.setState({step});
@@ -34,7 +51,14 @@ class Library extends React.Component {
             Add songs you know
           </StepButton>
           <StepContent>
-            <List tracks={this.props.active} />
+            <div className={classes.contentRoot}>
+              <div className={classes.listRoot}>
+                <TrackList tracks={this.props.active}/>
+              </div>
+              <Button mini variant="fab" color="secondary" className={classes.button}>
+                <IconAdd />
+              </Button>
+            </div>
           </StepContent>
         </Step>
         <Step>
@@ -42,7 +66,9 @@ class Library extends React.Component {
             Explore similar music
           </StepButton>
           <StepContent>
-            <List tracks={this.props.suggested} />
+            <div className={classes.listRoot}>
+              <TrackList tracks={this.props.suggested} />
+            </div>
           </StepContent>
         </Step>
         <Step>
