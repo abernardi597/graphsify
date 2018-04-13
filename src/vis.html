@@ -39,9 +39,10 @@ var height = 600;
 var radius = 15;
 
 var weights = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+var maxPossVal = 0;
 var maxVal = 0;
 for(var i = 0; i < weights.length; i++) {
-  maxVal += weights[i];
+  maxPossVal += weights[i];
 }
 
 function calcDist(f1, f2) {
@@ -80,47 +81,59 @@ function compareLinks(link1, link2) {
 
 function generateLinks(nodes) {
   var links = []
+  var linksByNode = []
   for(var i = 0; i < nodes.length; i++) {
-    for(var j = i; j < nodes.length; j++) {
+    var thisNodeLinks = []
+    for(var j = 0; j < nodes.length; j++) {
       if(i != j) {
         var source = nodes[i].id
         var target = nodes[j].id
         dist = calcDist(nodes[i].features, nodes[j].features)
+        console.log(dist)
         links.push({source: source, target: target, value: dist})
+        thisNodeLinks.push({source: source, target: target, value: dist})
       }
     }
+    linksByNode.push(thisNodeLinks)
   }
   links.sort(compareLinks)
   var toKeep = Math.ceil(links.length * .2)
-  links = links.splice(0, toKeep)
-  return links
+  var topLinks = links.splice(0, toKeep)
+  var linkList = topLinks
+  for(var i = 0; i < linksByNode.length; i++) {
+    toKeep = 1//Math.ceil(linksByNode[i].length * .1)
+    linkList = linkList.concat(linksByNode[i].sort(compareLinks).splice(0, toKeep))
+  }
+  linkList.sort(compareLinks)
+  maxVal = linkList[linkList.length-1].value
+  return linkList
 }
 
 var data = 
 [
-{id:1000, name:"song", artist:["singer1", "singer"], sample:"filler", 
+{id:1000, name:"Song 1", artist:["Artist 1", "Artist 2"], sample:"filler", 
   features:{loudness:10, danceability:Math.random(), key:Math.floor(Math.random()*6), mode:Math.floor(Math.random()*3), speechiness:Math.random(), acousticness:Math.random(), instrumentalness:Math.random(), liveness:Math.random(), valence:Math.random(), tempo:Math.floor(Math.random()*201), energy:Math.random()}},
-{id:1001, name:"song", artist:["singer"], sample:"filler", 
+{id:1001, name:"Song 2", artist:["Artist 1"], sample:"filler", 
   features:{loudness:10, danceability:Math.random(), key:Math.floor(Math.random()*6), mode:Math.floor(Math.random()*3), speechiness:Math.random(), acousticness:Math.random(), instrumentalness:Math.random(), liveness:Math.random(), valence:Math.random(), tempo:Math.floor(Math.random()*201), energy:Math.random()}},
-{id:1002, name:"song", artist:["singer"], sample:"filler", 
+{id:1002, name:"Song 3", artist:["Artist 2"], sample:"filler", 
   features:{loudness:10, danceability:Math.random(), key:Math.floor(Math.random()*6), mode:Math.floor(Math.random()*3), speechiness:Math.random(), acousticness:Math.random(), instrumentalness:Math.random(), liveness:Math.random(), valence:Math.random(), tempo:Math.floor(Math.random()*201), energy:Math.random()}},
-{id:1003, name:"song", artist:["singer"], sample:"filler", 
+{id:1003, name:"Song 4", artist:["Artist 2"], sample:"filler", 
   features:{loudness:10, danceability:Math.random(), key:Math.floor(Math.random()*6), mode:Math.floor(Math.random()*3), speechiness:Math.random(), acousticness:Math.random(), instrumentalness:Math.random(), liveness:Math.random(), valence:Math.random(), tempo:Math.floor(Math.random()*201), energy:Math.random()}},
-{id:1004, name:"song", artist:["singer"], sample:"filler", 
+{id:1004, name:"Song 5", artist:["Artist 3"], sample:"filler", 
   features:{loudness:10, danceability:Math.random(), key:Math.floor(Math.random()*6), mode:Math.floor(Math.random()*3), speechiness:Math.random(), acousticness:Math.random(), instrumentalness:Math.random(), liveness:Math.random(), valence:Math.random(), tempo:Math.floor(Math.random()*201), energy:Math.random()}},
-{id:1005, name:"song", artist:["singer"], sample:"filler", 
+{id:1005, name:"Song 6", artist:["Artist 3"], sample:"filler", 
   features:{loudness:10, danceability:Math.random(), key:Math.floor(Math.random()*6), mode:Math.floor(Math.random()*3), speechiness:Math.random(), acousticness:Math.random(), instrumentalness:Math.random(), liveness:Math.random(), valence:Math.random(), tempo:Math.floor(Math.random()*201), energy:Math.random()}},
-{id:1006, name:"song", artist:["singer"], sample:"filler", 
+{id:1006, name:"Song 7", artist:["Artist 4"], sample:"filler", 
   features:{loudness:10, danceability:Math.random(), key:Math.floor(Math.random()*6), mode:Math.floor(Math.random()*3), speechiness:Math.random(), acousticness:Math.random(), instrumentalness:Math.random(), liveness:Math.random(), valence:Math.random(), tempo:Math.floor(Math.random()*201), energy:Math.random()}},
-{id:1007, name:"song", artist:["singer"], sample:"filler", 
+{id:1007, name:"Song 8", artist:["Artist 4"], sample:"filler", 
   features:{loudness:10, danceability:Math.random(), key:Math.floor(Math.random()*6), mode:Math.floor(Math.random()*3), speechiness:Math.random(), acousticness:Math.random(), instrumentalness:Math.random(), liveness:Math.random(), valence:Math.random(), tempo:Math.floor(Math.random()*201), energy:Math.random()}},
-{id:1008, name:"song", artist:["singer"], sample:"filler", 
+{id:1008, name:"Song 9", artist:["Artist 4"], sample:"filler", 
   features:{loudness:10, danceability:Math.random(), key:Math.floor(Math.random()*6), mode:Math.floor(Math.random()*3), speechiness:Math.random(), acousticness:Math.random(), instrumentalness:Math.random(), liveness:Math.random(), valence:Math.random(), tempo:Math.floor(Math.random()*201), energy:Math.random()}},
-{id:1009, name:"song", artist:["singer"], sample:"filler", 
+{id:1009, name:"Song 10", artist:["Artist 4"], sample:"filler", 
   features:{loudness:10, danceability:Math.random(), key:Math.floor(Math.random()*6), mode:Math.floor(Math.random()*3), speechiness:Math.random(), acousticness:Math.random(), instrumentalness:Math.random(), liveness:Math.random(), valence:Math.random(), tempo:Math.floor(Math.random()*201), energy:Math.random()}},
-{id:1010, name:"song", artist:["singer"], sample:"filler", 
+{id:1010, name:"Song 11", artist:["Artist 5"], sample:"filler", 
   features:{loudness:10, danceability:Math.random(), key:Math.floor(Math.random()*6), mode:Math.floor(Math.random()*3), speechiness:Math.random(), acousticness:Math.random(), instrumentalness:Math.random(), liveness:Math.random(), valence:Math.random(), tempo:Math.floor(Math.random()*201), energy:Math.random()}},
-{id:1011, name:"song", artist:["singer"], sample:"filler", 
+{id:1011, name:"Song 12", artist:["Artist 6"], sample:"filler", 
   features:{loudness:10, danceability:Math.random(), key:Math.floor(Math.random()*6), mode:Math.floor(Math.random()*3), speechiness:Math.random(), acousticness:Math.random(), instrumentalness:Math.random(), liveness:Math.random(), valence:Math.random(), tempo:Math.floor(Math.random()*201), energy:Math.random()}},
 ];
 
@@ -151,7 +164,7 @@ var link = svg.append("g")
   .selectAll("line")
   .data(graph.links)
   .enter().append("line")
-  .attr("stroke-width", function(d) { return Math.sqrt(maxVal - d.value + 1); })
+  .attr("stroke-width", function(d) { return 1.5*(maxVal - d.value + 1); })
   .on("mouseover", function(d) {    
       tooltip.transition()    
              .duration(200)    
@@ -182,7 +195,7 @@ var node = svg.append("g")
       tooltip.transition()    
              .duration(200)    
              .style("opacity", .9);    
-      tooltip.html("Title: " + d.name + "<br/>Artist: " + d.artist.join(", "))  
+      tooltip.html("Title: " + d.name + "<br/>Artist(s): " + d.artist.join(", "))  
              .style("left", (d3.event.pageX) + "px")   
              .style("top", (d3.event.pageY - 28) + "px");  
     })          
