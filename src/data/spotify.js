@@ -55,24 +55,35 @@ function fetchAuthHeaders() {
   return authTokenPromise;
 }
 
-function fetchTrack(id) {
+function fetchTracks(ids) {
+  const count = ids.length;
+  if (count === 0) {
+    return Promise.resolve([]);
+  }
   return fetchAuthHeaders().then(headers => {
     const reqs = [];
-    reqs.push(axios.get('https://api.spotify.com/v1/tracks/' + id, headers));
-    reqs.push(axios.get('https://api.spotify.com/v1/audio-features/' + id, headers));
-    return Promise.all(reqs).then(resps => splice(resps[0].data, resps[1].data));
+    const qstr = ids.join(',');
+    reqs.push(axios.get('https://api.spotify.com/v1/tracks/?ids=' + qstr, headers));
+    reqs.push(axios.get('https://api.spotify.com/v1/audio-features/?ids=' + qstr, headers));
+    return Promise.all(reqs).catch(err => console.log(err.response)).then(resps => {
+      const tracks = [];
+      for (let i = 0; i < count; ++i) {
+        tracks.push(splice(resps[0].data.tracks[i], resps[1].data.audio_features[i]));
+      }
+      return tracks;
+    });
   });
 }
 
 function searchTracks(query) {
   return fetchAuthHeaders().then(headers =>
     axios.get('https://api.spotify.com/v1/search/?type=track&q=' + query.replace(' ', '+'), headers)
-      .then(resp => Promise.all(resp.data.tracks.items.map(track => fetchTrack(track.id))))
+      .then(resp => fetchTracks(resp.data.tracks.items.map(track => track.id)))
   );
 }
 
 const spotify = {};
-spotify.fetchTrack = fetchTrack;
+spotify.fetchTracks = fetchTracks;
 spotify.searchTracks = searchTracks;
 
 export default spotify;
