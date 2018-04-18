@@ -40,80 +40,39 @@ const style = theme => ({
   toolbar: theme.mixins.toolbar
 });
 
-const active = [
-  {
-    id: '5Cw6SX4MtdaOvM0GbN5g7j',
-    name: '8 Bit Adventure',
-    artists: ['AdhesiveWombat'],
-    album: 'Marsupial Madness',
-    art: {
-      height: 640,
-      width: 640,
-      url: 'https://i.scdn.co/image/af7dadc5da4ac8a3db7c2757228baf45eab7f63a'
-    },
-    sample: 'https://p.scdn.co/mp3-preview/f8084b79e16ac3849eb37cf9cf6c2ceafbea931c?cid=774b29d4f13844c495f206cafdad9c86',
-    features: {
-      danceability: 0.543,
-      energy: 0.794,
-      key: 1,
-      loudness: -7.377,
-      mode: 0,
-      speechiness: 0.0516,
-      acousticness: 0.0344,
-      instrumentalness: 0.174,
-      liveness: 0.122,
-      valence: 0.694,
-      tempo: 76.505
-    }
-  },
-  {
-    id: '2S4CfxZG29GZWwDeMtBq2R',
-    name: 'I Just Wanna Run',
-    artists: ['The Downtown Fiction'],
-    album: 'Best I Never Had',
-    art: {
-      height: 640,
-      width: 640,
-      url: 'https://i.scdn.co/image/4c78bf7f246502aefb02df7ef50ccce457497933'
-    },
-    sample: 'https://p.scdn.co/mp3-preview/d16ef491b7bf665198a991fcf81c53f3df6fcd4d?cid=774b29d4f13844c495f206cafdad9c86',
-    features: {
-      danceability: 0.669,
-      energy: 0.667,
-      key: 4,
-      loudness: -3,
-      mode: 1,
-      speechiness: 0.0511,
-      acousticness: 0.00769,
-      instrumentalness: 0,
-      liveness: 0.0983,
-      valence: 0.69,
-      tempo: 128.103
-    }
+class App extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      active: [],
+      suggested: []
+    };
   }
-];
 
-const suggested = [];
-
-function App(props) {
-  const {classes} = props;
-  return (
-    <MuiThemeProvider theme={theme}>
-      <div className={classes.root}>
-        <AppBar position="absolute" className={classes.bar}>
-          <Toolbar>
-            <Typography variant="title" color="inherit" noWrap>
-              Graphsify
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <Drawer variant="permanent" classes={{paper: classes.drawer}}>
-          <div className={classes.toolbar} />
-          <Library active={active} suggested={suggested}/>
-        </Drawer>
-      </div>
-    </MuiThemeProvider>
-  );
+  render() {
+    const {classes} = this.props;
+    const {active, suggested} = this.state;
+    return (
+      <MuiThemeProvider theme={theme}>
+        <div className={classes.root}>
+          <AppBar position="absolute" className={classes.bar}>
+            <Toolbar>
+              <Typography variant="title" color="inherit" noWrap>
+                Graphsify
+              </Typography>
+            </Toolbar>
+          </AppBar>
+          <Drawer variant="permanent" classes={{paper: classes.drawer}}>
+            <div className={classes.toolbar} />
+            <Library active={active} suggested={suggested}/>
+          </Drawer>
+          <main className={classes.content}>
+            <div className={classes.toolbar} />
+          </main>
+        </div>
+      </MuiThemeProvider>
+    );
+  }
 }
 
 App.propTypes = {
