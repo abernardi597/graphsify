@@ -75,9 +75,14 @@ function fetchTracks(ids) {
 }
 
 function searchTracks(query) {
-  return fetchAuthHeaders().then(headers =>
-    axios.get('https://api.spotify.com/v1/search/?type=track&q=' + query.replace(' ', '+'), headers)
-      .then(resp => fetchTracks(resp.data.tracks.items.map(track => track.id)))
+  query = query.trim();
+  let url = 'https://api.spotify.com/v1/search/?type=track&q=' + query.replace(' ', '+');
+  if (query.length <= 0)
+    return Promise.resolve([]);
+  else if (query.length > 5)
+    url += '*';
+  return fetchAuthHeaders().then(headers => axios.get(url, headers)
+    .then(resp => fetchTracks(resp.data.tracks.items.map(track => track.id)))
   );
 }
 
