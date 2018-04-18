@@ -2,10 +2,6 @@
 <meta charset="utf-8">
 <style>
 
-.links line {
-  stroke: #999;
-  stroke-opacity: 0.6;
-}
 
 .nodes circle {
   stroke: #fff;
@@ -15,9 +11,9 @@
 div.tooltip { 
     position: absolute;     
     text-align: center;     
-    width: 120px;          
-    height: 80px;         
-    padding: 2px;       
+    width: auto;          
+    height: auto;         
+    padding: 5px;       
     font: 12px sans-serif;    
     background: lightsteelblue; 
     border: 0px;    
@@ -32,12 +28,14 @@ div.tooltip {
 </style>
 <svg width="960" height="600"></svg>
 <script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 
 <script>
 var width = 960;
 var height = 600;
 var radius = 15;
 
+// acousticness, danceability, energy, instrumentalness, key, liveness, mode, speechiness, tempo, valence
 var weights = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 var maxPossVal = 0;
 var maxVal = 0;
@@ -46,7 +44,6 @@ for(var i = 0; i < weights.length; i++) {
 }
 
 function calcDist(f1, f2) {
-  // acousticness, danceability, energy, instrumentalness, key, liveness, mode, speechiness, tempo, valence
   var values = []
   values.push(Math.abs(f1.acousticness - f2.acousticness))
   values.push(Math.abs(f1.danceability - f2.danceability))
@@ -68,11 +65,22 @@ function calcDist(f1, f2) {
   values.push(Math.abs(f1.speechiness - f2.speechiness))
   values.push(Math.abs(f1.tempo - f2.tempo) / 200)
   values.push(Math.abs(f1.valence - f2.valence))
+
+  console.log(values)
+
+  var features = ["acousticness", "danceability", "energy", "instrumentalness", "key", "liveness", "mode", "speechiness", "tempo", "valence"]
+
+  // FROM: http://takeip.com/what-is-the-javascript-equivalent-of-numpy-argsort.html
+  const similarIn = features
+  .map((item, index) => [values[index], item]) // add the clickCount to sort by
+  .sort(([count1], [count2]) => count2 - count1) // sort by the clickCount data
+  .map(([, item]) => item); // extract the sorted items
+
   var dist = 0;
   for(var i=0; i < values.length; i++) {
     dist += values[i] * weights[i];
   }
-  return dist;
+  return [dist, similarIn];
 }
 
 function compareLinks(link1, link2) {
@@ -88,10 +96,9 @@ function generateLinks(nodes) {
       if(i != j) {
         var source = nodes[i].id
         var target = nodes[j].id
-        dist = calcDist(nodes[i].features, nodes[j].features)
-        console.log(dist)
-        links.push({source: source, target: target, value: dist})
-        thisNodeLinks.push({source: source, target: target, value: dist})
+        var result = calcDist(nodes[i].features, nodes[j].features)
+        links.push({source: source, target: target, value: result[0], similarIn: result[1]})
+        thisNodeLinks.push({source: source, target: target, value: result[0], similarIn:result[1]})
       }
     }
     linksByNode.push(thisNodeLinks)
@@ -107,6 +114,11 @@ function generateLinks(nodes) {
   linkList.sort(compareLinks)
   maxVal = linkList[linkList.length-1].value
   return linkList
+}
+
+function rescale(x, newMin, newMax, oldMin, oldMax) {
+  newX = ((newMax - newMin) * (x - oldMin)) / (oldMax - oldMin) + newMin
+  return newX
 }
 
 /*var data = 
@@ -140,7 +152,17 @@ var data = [
 {id:1, name: "Love Lies", artist: ["Khalid", "Normani"], features: {acousticness:0.0956, danceability:0.708, energy:0.648, instrumentalness:0, key:6, liveness:0.134, loudness:-5.626, mode:1, popularity:98, speechiness:0.0449, tempo:143.955, valence:0.338}},
 {id:2, name: "Dangerously In Love", artist: ["Beyoncé", "JAY Z"], features: {acousticness:0.00249, danceability:0.646, energy:0.77, instrumentalness:0, key:2, liveness:0.0715, loudness:-6.596, mode:0, popularity:80, speechiness:0.226, tempo:99.165, valence:0.681}},
 {id:3, name: "Bad at Love", artist: ["Halsey"], features: {acousticness:0.06, danceability:0.675, energy:0.736, instrumentalness:0, key:0, liveness:0.0879, loudness:-3.604, mode:1, popularity:82, speechiness:0.0302, tempo:118.369, valence:0.607}},
-{id:4, name: "Mad Love", artist: ["Sean Paul", "David Guetta", "Becky G"], features: {acousticness:0.00523, danceability:0.804, energy:0.823, instrumentalness:0, key:11, liveness:0.168, loudness:-3.496, mode:0, popularity:83, speechiness:0.147, tempo:98.026, valence:0.619}}
+{id:4, name: "Mad Love", artist: ["Sean Paul", "David Guetta", "Becky G"], features: {acousticness:0.00523, danceability:0.804, energy:0.823, instrumentalness:0, key:11, liveness:0.168, loudness:-3.496, mode:0, popularity:83, speechiness:0.147, tempo:98.026, valence:0.619}},
+{id:5, name: "You Give Love A Bad Name", artist: ["Bon Jovi"], features: {acousticness:0.0704, danceability:0.537, energy:0.959, instrumentalness:0, key:0, liveness:0.382, loudness:-3.002, mode:0, popularity:83, speechiness:0.0557, tempo:122.026, valence:0.828}},
+{id:6, name: "Livin' On A Prayer", artist: ["Bon Jovi"], features: {acousticness:0.0768, danceability:0.534, energy:0.887, instrumentalness:0, key:0, liveness:0.325, loudness:-3.002, mode:1, popularity:83, speechiness:0.0345, tempo:122.494, valence:0.72}},
+{id:7, name: "It's My Life", artist: ["Bon Jovi"], features: {acousticness:0.0338, danceability:0.537, energy:0.903, instrumentalness:0, key:0, liveness:0.341, loudness:-3.002, mode:0, popularity:83, speechiness:0.0505, tempo:120.069, valence:0.571}},
+{id:8, name: "In the End", artist: ["Linkin Park"], features: {acousticness:0.0113, danceability:0.553, energy:0.90, instrumentalness:0, key:3, liveness:0.322, loudness:-3.002, mode:0, popularity:83, speechiness:0.0584, tempo:105.213, valence:0.398}},
+{id:9, name: "Numb", artist: ["Linkin Park"], features: {acousticness:0.0046, danceability:0.496, energy:0.863, instrumentalness:0, key:9, liveness:0.639, loudness:-3.002, mode:1, popularity:83, speechiness:0.0381, tempo:110.018, valence:0.243}},
+{id:10, name: "Heavy", artist: ["Linkin Park", "Kiiara"], features: {acousticness:0.0484, danceability:0.59, energy:0.671, instrumentalness:0, key:9, liveness:0.0604, loudness:-3.002, mode:1, popularity:83, speechiness:0.0706, tempo:149.982, valence:0.438}},
+{id:11, name: "Mr. Brightside", artist: ["The Killers"], features: {acousticness:0.00108, danceability:0.33, energy:0.936, instrumentalness:0, key:1, liveness:0.0926, loudness:-3.002, mode:1, popularity:83, speechiness:0.0917, tempo:148.982, valence:0.234}},
+{id:12, name: "Somebody Told Me", artist: ["The Killers"], features: {acousticness:0.000123, danceability:0.5, energy:0.975, instrumentalness:0, key:10, liveness:0.0104, loudness:-3.002, mode:0, popularity:83, speechiness:0.0824, tempo:138, valence:0.767}},
+{id:13, name: "When You Were Young", artist: ["The Killers"], features: {acousticness:0.000202, danceability:0.463, energy:0.983, instrumentalness:0.129, key:8, liveness:0.303, loudness:-3.002, mode:0, popularity:83, speechiness:0.138, tempo:130, valence:0.37}},
+{id:14, name: "Numb/Encore", artist: ["JAY Z, Linkin Park"], features: {acousticness:0.0601, danceability:0.685, energy:0.803, instrumentalness:0, key:2, liveness:0.546, loudness:-3.002, mode:1, popularity:83, speechiness:0.158, tempo:107, valence:0.799}}
 ]
 
 var artists = [];
@@ -171,11 +193,12 @@ var link = svg.append("g")
   .data(graph.links)
   .enter().append("line")
   .attr("stroke-width", function(d) { return 1.5*(maxVal - d.value + 1); })
+  .attr("stroke", function(d) {return d3.interpolateGreys(1-rescale(d.value, 0, .6, 0, maxVal))})
   .on("mouseover", function(d) {    
       tooltip.transition()    
              .duration(200)    
              .style("opacity", .9);    
-      tooltip.html(d.value)  
+      tooltip.html("Most similiar due to: <br/>" + d.similarIn.slice(0,3).join(", "))  
              .style("left", (d3.event.pageX) + "px")   
              .style("top", (d3.event.pageY - 28) + "px");  
     })          
