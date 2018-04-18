@@ -17,9 +17,9 @@ const styles = {
 };
 
 let Track = props => {
-  const {track} = props;
+  const {track, onClick} = props;
   return (
-    <ListItem button>
+    <ListItem button onClick={() => onClick ? onClick(track) : null}>
       <ListItemAvatar>
         <Avatar src={track.art.url} />
       </ListItemAvatar>
@@ -30,13 +30,14 @@ let Track = props => {
 
 Track.propTypes = {
   track: PropTypes.object.isRequired,
+  onClick: PropTypes.func,
   classes: PropTypes.object.isRequired
 };
 
 Track = withStyles(styles)(Track);
 
 function TrackList(props) {
-  const {tracks, classes} = props;
+  const {tracks, onClick, classes} = props;
   if (tracks.length === 0) return (
     <div className={classes.empty}>
       <Typography variant="caption" color="textSecondary">
@@ -46,13 +47,14 @@ function TrackList(props) {
   );
   else return (
     <List dense>
-      {tracks.map(track => (<Track key={track.id} track={track} />))}
+      {tracks.map(track => (<Track key={track.id} track={track} onClick={onClick} />))}
     </List>
   );
 }
 
 TrackList.propTypes = {
   tracks: PropTypes.array.isRequired,
+  onClick: PropTypes.func,
   classes: PropTypes.object.isRequired
 };
 
