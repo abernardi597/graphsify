@@ -59,8 +59,7 @@ function fetchTracks(ids) {
   const count = ids.length;
   if (count === 0) {
     return Promise.resolve([]);
-  }
-  return fetchAuthHeaders().then(headers => {
+  } else return fetchAuthHeaders().then(headers => {
     const reqs = [];
     const qstr = ids.join(',');
     reqs.push(axios.get('https://api.spotify.com/v1/tracks/?ids=' + qstr, headers));

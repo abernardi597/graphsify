@@ -24,7 +24,13 @@
   "xo": {
     "space": true,
     "rules": {
-      "linebreak-style": 0
+      "linebreak-style": 0,
+      "no-else-return": [
+        "off"
+      ],
+      "curly": [
+        "off"
+      ]
     },
     "envs": [
       "browser"
