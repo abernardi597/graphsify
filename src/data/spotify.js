@@ -67,7 +67,10 @@ function fetchTracks(ids) {
     return Promise.all(reqs).catch(err => console.log(err.response)).then(resps => {
       const tracks = [];
       for (let i = 0; i < count; ++i) {
-        tracks.push(splice(resps[0].data.tracks[i], resps[1].data.audio_features[i]));
+        const track = resps[0].data.tracks[i];
+        const features = resps[1].data.audio_features[i];
+        if (track && features)
+          tracks.push(splice(track, features));
       }
       return tracks;
     });
