@@ -2,6 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ReactFauxDOM, {withFauxDOM} from 'react-faux-dom';
 
+// Should be: import * as d3 from 'd3'
+// But eslint throws a fit...
+const d3 = require('d3');
+
 class Visualization extends React.Component {
   componentDidMount() {
     const faux = this.props.connectFauxDOM('svg', 'rd3');
