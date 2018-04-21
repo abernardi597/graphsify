@@ -9,6 +9,7 @@ import Visualization from './ui/vis';
 
 import spotify from './data/spotify';
 
+// "acousticness", "danceability", "energy", "instrumentalness", "key", "liveness", "mode", "speechiness", "tempo", "valence"
 Promise.all([spotify.searchTracks('Love'), spotify.searchTracks('Hate')]).then(res =>
-  render(<Visualization active={res[0]} suggested={res[1]}/>, document.querySelector('#root'))
+  render(<Visualization active={res[0]} suggested={res[1]} weights={[1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}/>, document.querySelector('#root'))
 );

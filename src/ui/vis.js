@@ -12,19 +12,34 @@ class Visualization extends React.Component {
   }
 
   drawChart() {
-    const {active, suggested} = this.props;
+    const {active, suggested, weights} = this.props;
+    var activeList = active.map(function(el) {
+      var o = Object.assign({}, el);
+      o.isSuggested = false;
+      return o;
+    })
+    var suggestedList = suggested.map(function(el) {
+      var o = Object.assign({}, el);
+      o.isSuggested = true;
+      return o;
+    })
 
-    var weights = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+    var features = ["acousticness", "danceability", "energy", "instrumentalness", "key", "liveness", "mode", "speechiness", "tempo", "valence"]
+    var topWeights = features
+      .map((item, index) => [weights[index], item]) // add the clickCount to sort by
+      .sort(([count1], [count2]) => count2 - count1) // sort by the clickCount data
+      .map(([, item]) => item); // extract the sorted items
+    topWeights = topWeights.slice(0,3)
+
     var maxVal = 0;
 
     var width = 960;
     var height = 600;
     var radius = 15;
 
-    const data = active
+    const data = activeList.concat(suggestedList)
     console.log(data)
     const div = ReactFauxDOM.createElement('div');
-
 
     var artists = [];
     for(let i = 0; i < data.length; i++) {
@@ -79,13 +94,13 @@ class Visualization extends React.Component {
         });
 
     var node = svg.append("g")
-      .attr("stroke", "#fff")
-      .attr("stroke-width", "1.5px")
       .selectAll("circle")
       .data(graph.nodes)
       .enter().append("circle")
-      .attr("r", radius)
-      .attr("fill", function(d) { return color(artists.indexOf(d.artists[0])); })
+      .attr("r", function(d) { return d.isSuggested ? radius-1 : radius })
+      .attr("fill", function(d) { return d.isSuggested ? "#fff" : getColor(d.features, d.isSuggested); })
+      .attr("stroke", function(d) { return d.isSuggested ? getColor(d.features, d.isSuggested) : "#fff"})
+      .attr("stroke-width", function(d) { return d.isSuggested ? "2px" : "1.5px" })
       .call(d3.drag()
             .on("start", dragstarted)
             .on("drag", dragged)
@@ -93,10 +108,17 @@ class Visualization extends React.Component {
       .on("mouseover", function(d) {    
         tooltip.transition()    
                .duration(200)    
-               .style("opacity", .9);    
-        tooltip.html("Title: " + d.name + "<br/>Artist(s): " + d.artists.join(", "))  
+               .style("opacity", .9);  
+        if(d.isSuggested) {  
+          tooltip.html("Suggested Song:" + "<br/>Title: " + d.name + "<br/>Artist(s): " + d.artists.join(", "))  
                .style("left", (Math.max(50, Math.min(width - 50, d3.event.pageX))) + "px")   
                .style("top", (Math.max(30, Math.min(height - 30, d3.event.pageY - 28))) + "px");  
+        }
+        else {
+          tooltip.html("Title: " + d.name + "<br/>Artist(s): " + d.artists.join(", "))  
+               .style("left", (Math.max(50, Math.min(width - 50, d3.event.pageX))) + "px")   
+               .style("top", (Math.max(30, Math.min(height - 30, d3.event.pageY - 28))) + "px");  
+        }
       })          
       .on("mouseout", function(d) {   
         tooltip.transition()    
@@ -108,7 +130,7 @@ class Visualization extends React.Component {
     .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(function(d) { return d.value * 30}))
     .force("charge", d3.forceManyBody().strength(function(d) {return d.value*-30}).strength(-300))
     .force("center", d3.forceCenter(width / 2, height / 2))
-    .force("collide", d3.forceCollide().radius(15))
+    .force("collide", d3.forceCollide().radius(radius+3))
     .stop();
 
     simulation
@@ -118,8 +140,9 @@ class Visualization extends React.Component {
     simulation.force("link")
         .links(graph.links);
 
-    for (var i = 0; i < 50; ++i) simulation.tick();
-          node
+    for (var i = 0; i < graph.nodes.length*5; ++i) simulation.tick();
+
+    node
         .attr("cx", function(d) { return d.x = Math.max(radius, Math.min(width - radius, d.x)); })
         .attr("cy", function(d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); });
 
@@ -129,7 +152,27 @@ class Visualization extends React.Component {
         .attr("x2", function(d) { return d.target.x; })
         .attr("y2", function(d) { return d.target.y; });
 
-
+    function getColor(features, isSuggested) {
+      var r = features[topWeights[0]]
+      var g = features[topWeights[1]]
+      var b = features[topWeights[2]]
+      if(topWeights[0] === 'tempo') {
+        r /= 200
+      }    
+      if(topWeights[1] === 'tempo') {
+        g /= 200
+      }
+      if(topWeights[2] === 'tempo') {
+        b /= 200
+      }
+      r = Math.round(r * 255)
+      g = Math.round(g * 255)
+      b = Math.round(b * 255)
+      if(isSuggested) {
+        return d3.rgb(r, g, b, 1)
+      }
+      return d3.rgb(r, g, b, 1)
+    }
 
     function ticked() {
       link
@@ -183,8 +226,6 @@ class Visualization extends React.Component {
       values.push(Math.abs(f1.tempo - f2.tempo) / 200)
       values.push(Math.abs(f1.valence - f2.valence))
 
-      var features = ["acousticness", "danceability", "energy", "instrumentalness", "key", "liveness", "mode", "speechiness", "tempo", "valence"]
-
       // FROM: http://takeip.com/what-is-the-javascript-equivalent-of-numpy-argsort.html
       const similarIn = features
       .map((item, index) => [values[index], item]) // add the clickCount to sort by
@@ -219,7 +260,7 @@ class Visualization extends React.Component {
         linksByNode.push(thisNodeLinks)
       }
       links.sort(compareLinks)
-      var toKeep = nodes.length * 3//Math.ceil(links.length * .2)
+      var toKeep = nodes.length*3//Math.ceil(links.length * .2)
       var topLinks = links.splice(0, toKeep)
       var linkList = topLinks
       for(let i = 0; i < linksByNode.length; i++) {
@@ -248,6 +289,7 @@ class Visualization extends React.Component {
     // txt.setAttribute('y', 15);
     // txt.innerHTML = 'D3 goes here';
     // faux.appendChild(txt);
+    //this.props.animateFauxDOM(2500)
   }
 
   render() {
@@ -263,7 +305,8 @@ Visualization.propTypes = {
   rd3: PropTypes.object,
   connectFauxDOM: PropTypes.func,
   active: PropTypes.array.isRequired,
-  suggested: PropTypes.array.isRequired
+  suggested: PropTypes.array.isRequired,
+  weights: PropTypes.array.isRequired
 };
 
 export default withFauxDOM(Visualization);
