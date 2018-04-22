@@ -39,7 +39,7 @@ class Library extends React.Component {
 
   render() {
     const {step} = this.state;
-    const {classes} = this.props;
+    const {active, suggested, fabAdd, classes} = this.props;
     const color = index => step === index ? 'secondary' : 'disabled';
     const changeStep = step => () => {
       this.setState({step});
@@ -53,9 +53,9 @@ class Library extends React.Component {
           <StepContent>
             <div className={classes.contentRoot}>
               <div className={classes.listRoot}>
-                <TrackList tracks={this.props.active}/>
+                <TrackList tracks={active}/>
               </div>
-              <Button mini variant="fab" color="secondary" className={classes.button}>
+              <Button mini variant="fab" color="secondary" onClick={fabAdd} className={classes.button}>
                 <IconAdd />
               </Button>
             </div>
@@ -67,7 +67,7 @@ class Library extends React.Component {
           </StepButton>
           <StepContent>
             <div className={classes.listRoot}>
-              <TrackList tracks={this.props.suggested} />
+              <TrackList tracks={suggested} />
             </div>
           </StepContent>
         </Step>
@@ -86,6 +86,7 @@ class Library extends React.Component {
 Library.propTypes = {
   active: PropTypes.array.isRequired,
   suggested: PropTypes.array.isRequired,
+  fabAdd: PropTypes.func,
   classes: PropTypes.object.isRequired
 };
 
