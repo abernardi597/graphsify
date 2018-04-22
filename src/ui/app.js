@@ -9,6 +9,7 @@ import Typography from 'material-ui/Typography';
 import Drawer from 'material-ui/Drawer';
 
 import Library from './library';
+import TrackAdder from './adder';
 
 const theme = createMuiTheme({
   palette: {
@@ -45,13 +46,26 @@ class App extends React.Component {
     super();
     this.state = {
       active: [],
-      suggested: []
+      suggested: [],
+      adding: false
     };
   }
 
   render() {
     const {classes} = this.props;
-    const {active, suggested} = this.state;
+    const {active, suggested, adding} = this.state;
+    const add = track => {
+      if (!active.includes(track)) {
+        active.push(track);
+        this.setState({active});
+      }
+    };
+    const open = () => {
+      this.setState({adding: true});
+    };
+    const close = () => {
+      this.setState({adding: false});
+    };
     return (
       <MuiThemeProvider theme={theme}>
         <div className={classes.root}>
@@ -64,12 +78,13 @@ class App extends React.Component {
           </AppBar>
           <Drawer variant="permanent" classes={{paper: classes.drawer}}>
             <div className={classes.toolbar} />
-            <Library active={active} suggested={suggested}/>
+            <Library active={active} suggested={suggested} fabAdd={open}/>
           </Drawer>
           <main className={classes.content}>
             <div className={classes.toolbar} />
           </main>
         </div>
+        <TrackAdder open={adding} onClose={close} onSelect={add} />
       </MuiThemeProvider>
     );
   }
