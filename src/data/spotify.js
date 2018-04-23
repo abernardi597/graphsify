@@ -1,6 +1,8 @@
 // "Request" library
 import axios from 'axios';
 
+import * as Features from './features';
+
 const clientId = 'ea788a5aa0034d16a33d9d60488f2f45'; // Your client id
 const clientSecret = '2a21c40782a34a71bb28701440b287be'; // Your secret
 
@@ -12,20 +14,7 @@ function splice(track, features) {
     album: track.album.name,
     art: track.album.images[0],
     sample: track.preview_url,
-    features: {
-      acousticness: features.acousticness,
-      danceability: features.danceability,
-      energy: features.energy,
-      instrumentalness: features.instrumentalness,
-      key: features.key,
-      liveness: features.liveness,
-      loudness: features.loudness,
-      mode: features.mode,
-      popularity: track.popularity,
-      speechiness: features.speechiness,
-      tempo: features.tempo,
-      valence: features.valence
-    }
+    features: Features.map(feature => feature.extract(track, features))
   };
 }
 
@@ -89,8 +78,24 @@ function searchTracks(query) {
   );
 }
 
+function recommendTracks(track, weights) {
+  let url = 'https://api.spotify.com/v1/recommendations?seed_tracks=' + track.id;
+  for (const feature of Object.keys(track.features)) {
+    url += '&target_' + feature + '=' + (track.features[feature]);
+    if (feature in weights && weights[feature] > 0) {
+      const delta = Features.features[feature].threshold(weights[feature]) / 2;
+      url += '&min_' + feature + '=' + (track.features[feature] - delta);
+      url += '&max_' + feature + '=' + (track.features[feature] + delta);
+    }
+  }
+  return fetchAuthHeaders().then(headers => axios.get(url, headers)
+    .then(resp => fetchTracks(resp.data.tracks.filter(t => t.id !== track.id).map(track => track.id)))
+  );
+}
+
 const spotify = {};
 spotify.fetchTracks = fetchTracks;
 spotify.searchTracks = searchTracks;
+spotify.recommendTracks = recommendTracks;
 
 export default spotify;
