@@ -1,35 +1,29 @@
-import acousticness from './acousticness';
-import danceability from './danceability';
-import energy from './energy';
-import instrumentalness from './instrumentalness';
-import key from './key';
-import liveness from './liveness';
-import loudness from './loudness';
-import mode from './mode';
-import popularity from './popularity';
-import speechiness from './speechiness';
-import tempo from './tempo';
-import valence from './valence';
+import Feature from './feature';
+import * as Features from '.';
 
-const features = Object.freeze({
-  acousticness,
-  danceability,
-  energy,
-  instrumentalness,
-  key,
-  liveness,
-  loudness,
-  mode,
-  popularity,
-  speechiness,
-  tempo,
-  valence
-});
+export {default as acousticness} from './acousticness';
+export {default as danceability} from './danceability';
+export {default as energy} from './energy';
+export {default as instrumentalness} from './instrumentalness';
+export {default as key} from './key';
+export {default as liveness} from './liveness';
+export {default as loudness} from './loudness';
+export {default as mode} from './mode';
+export {default as popularity} from './popularity';
+export {default as speechiness} from './speechiness';
+export {default as tempo} from './tempo';
+export {default as valence} from './valence';
 
-export {features};
+export function forEach(func) {
+  for (const [name, feature] of Object.entries(Features))
+    if (feature instanceof Feature)
+      func(feature, name);
+}
+
 export function map(transform) {
   const obj = {};
-  for (const [name, feature] of Object.entries(features))
+  forEach((feature, name) => {
     obj[name] = transform(feature, name);
+  });
   return obj;
 }

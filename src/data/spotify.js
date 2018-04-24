@@ -86,7 +86,7 @@ function recommendTracks(track, weights, limit) {
   for (const feature of Object.keys(track.features)) {
     url += '&target_' + feature + '=' + (track.features[feature]);
     if (feature in weights && weights[feature] > 0) {
-      const delta = Features.features[feature].threshold(weights[feature]) / 2;
+      const delta = Features[feature].threshold(weights[feature]) / 2;
       url += '&min_' + feature + '=' + (track.features[feature] - delta);
       url += '&max_' + feature + '=' + (track.features[feature] + delta);
     }
