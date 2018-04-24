@@ -10,6 +10,8 @@ import Typography from 'material-ui/Typography';
 
 import Drawer from 'material-ui/Drawer';
 
+import spotify from '../data/spotify';
+
 import Library from './library';
 import TrackAdder from './adder';
 
@@ -51,6 +53,12 @@ class App extends React.Component {
     this.state = {
       active: [],
       suggested: [],
+      weights: {
+        energy: 0.9,
+        valence: 0.8,
+        danceability: 0.7,
+        tempo: 0.6
+      },
       adding: false,
       sliding: false
     };
@@ -58,11 +66,17 @@ class App extends React.Component {
 
   render() {
     const {classes} = this.props;
-    const {active, suggested, adding, sliding} = this.state;
+    const {active, suggested, weights, adding, sliding} = this.state;
     const add = track => {
       if (!active.includes(track)) {
         active.push(track);
         this.setState({active});
+        console.log(track);
+        spotify.recommendTracks(track, weights, 4)
+          .then(tracks => tracks.forEach(track => {
+            if (!suggested.includes(track) && !active.includes(track))
+              suggested.push(track);
+          }));
       }
     };
     const open = () => {
