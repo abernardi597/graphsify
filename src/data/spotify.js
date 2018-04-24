@@ -80,9 +80,6 @@ function searchTracks(query) {
 
 function recommendTracks(track, weights, limit) {
   let url = 'https://api.spotify.com/v1/recommendations?seed_tracks=' + track.id;
-  if (limit === undefined)
-    limit = 20;
-  url += '&limit=' + (limit + 1);
   for (const feature of Object.keys(track.features)) {
     url += '&target_' + feature + '=' + (track.features[feature]);
     if (feature in weights && weights[feature] > 0) {
@@ -91,13 +88,11 @@ function recommendTracks(track, weights, limit) {
       url += '&max_' + feature + '=' + (track.features[feature] + delta);
     }
   }
-  return fetchAuthHeaders().then(headers => axios.get(url, headers)
-    .then(resp => {
-      const tracks = resp.data.tracks.map(track => track.id).filter(id => id !== track.id);
-      if (tracks.length > limit)
-        tracks.pop();
-      return fetchTracks(tracks);
-    }));
+  return fetchAuthHeaders().then(headers => axios.get(url, headers))
+    .then(resp => resp.data.tracks.map(track => track.id).filter(id => id !== track.id))
+    .then(tracks => fetchTracks(tracks))
+    .then(tracks => tracks.sort((a, b) => Features.distance(track.features, a.features, weights) - Features.distance(track.features, b.features, weights)))
+    .then(tracks => tracks.slice(0, limit));
 }
 
 const spotify = {};
