@@ -27,3 +27,15 @@ export function map(transform) {
   });
   return obj;
 }
+
+export function distance(v1, v2, weights) {
+  let d = 0;
+  forEach((feature, name) => {
+    if (name in weights && weights[name] > 0) {
+      if (name in v1 && name in v2)
+        d += weights[name] * weights[name] * feature.distance(v1[name], v2[name]);
+      else d += weights[name] * weights[name];
+    }
+  });
+  return d;
+}
