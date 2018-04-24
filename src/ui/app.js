@@ -12,6 +12,7 @@ import Drawer from 'material-ui/Drawer';
 
 import spotify from '../data/spotify';
 
+import Graph from './graph';
 import Library from './library';
 import TrackAdder from './adder';
 
@@ -43,6 +44,10 @@ const style = theme => ({
   },
   drawer: {
     width: 400
+  },
+  content: {
+    marginLeft: 400,
+    position: 'relative'
   },
   toolbar: theme.mixins.toolbar
 });
@@ -108,9 +113,10 @@ class App extends React.Component {
           <Drawer variant="persistent" anchor="right" classes={{paper: classes.drawer}} open={sliding}>
             <div className={classes.toolbar} />
           </Drawer>
-          <main className={classes.content}>
+          <div className={classes.content}>
             <div className={classes.toolbar} />
-          </main>
+            <Graph active={active} suggested={suggested} weights={weights} />
+          </div>
         </div>
         <TrackAdder open={adding} onClose={close} onSelect={add} />
       </MuiThemeProvider>
