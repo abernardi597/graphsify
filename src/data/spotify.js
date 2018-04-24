@@ -78,8 +78,11 @@ function searchTracks(query) {
   );
 }
 
-function recommendTracks(track, weights) {
+function recommendTracks(track, weights, limit) {
   let url = 'https://api.spotify.com/v1/recommendations?seed_tracks=' + track.id;
+  if (limit === undefined)
+    limit = 20;
+  url += '&limit=' + (limit + 1);
   for (const feature of Object.keys(track.features)) {
     url += '&target_' + feature + '=' + (track.features[feature]);
     if (feature in weights && weights[feature] > 0) {
@@ -89,8 +92,12 @@ function recommendTracks(track, weights) {
     }
   }
   return fetchAuthHeaders().then(headers => axios.get(url, headers)
-    .then(resp => fetchTracks(resp.data.tracks.filter(t => t.id !== track.id).map(track => track.id)))
-  );
+    .then(resp => {
+      const tracks = resp.data.tracks.map(track => track.id).filter(id => id !== track.id);
+      if (tracks.length > limit)
+        tracks.pop();
+      return fetchTracks(tracks);
+    }));
 }
 
 const spotify = {};
